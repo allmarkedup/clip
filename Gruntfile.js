@@ -13,7 +13,7 @@ module.exports = function(grunt) {
         },
         phpcsfixer: {
             src: {
-                dir: 'src/*'
+                dir: 'src'
             },
             options: {
 
