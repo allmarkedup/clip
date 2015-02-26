@@ -1,30 +1,10 @@
 <?php namespace Amu\Clip\Annotations;
 
 abstract class AnnotationParser
-{
-    protected $reflectionObject;
-
-    protected $annotations;
-
+{   
     private $keyPattern = "[A-z0-9\_\-]+";
 
     private $endPattern = "[ ]*(?:@|\r\n|\n)";
-
-    public function getAnnotation($annotation)
-    {
-        $annotations = $this->getAnnotations();
-        
-        return isset($annotations[$annotation]) ? $annotations[$annotation] : null;
-    }
-
-    public function getAnnotations()
-    {
-        if (! $this->annotations) {
-            $this->annotations = $this->parseAnnotations($this->reflectionObject->getDocComment());
-        }
-
-        return $this->annotations;
-    }
 
     protected function parseAnnotations($docBlock)
     {

@@ -2,19 +2,23 @@
 
 use Amu\Clip\Input;
 use Amu\Clip\Output;
-use Amu\Clip\Command;
+use Amu\Clip\Commands\BaseCommand;
 
 /**
  * @command list
  * @description List all available commands
  */
-class ListCommand extends Command
+class ListCommand extends BaseCommand
 {
     public function execute(Input $input, Output $output)
     {
         $commands = $this->getConsole()->getCommands();
-        foreach($commands as $command){
-            echo $command->getName() . "\n";
+        $output->br();
+        foreach ($commands as $command) {
+            $output->padding(20)
+                    ->label($command->getName())
+                    ->result($command->getDescription());
         }
+        $output->br();
     }
 }

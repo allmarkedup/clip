@@ -1,5 +1,8 @@
-<?php namespace Amu\Clip;
+<?php namespace Amu\Clip\Commands;
 
+use Amu\Clip\Input;
+use Amu\Clip\Output;
+use Amu\Clip\Console;
 use Amu\Clip\Annotations\ClassParser;
 
 abstract class Command
