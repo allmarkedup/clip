@@ -51,21 +51,11 @@ class Console
             }
 
             $input = new Input($argv);
-
-            if ($this->validateInput($input, $command->getOpts())) {
-                $command->execute($input, $output);
-            }
+            $input->parseAndValidate($command->getSignature());
+            $command->run($input, $output);
 
         } catch (Exception $e) {
             $output->error($e->getMessage());
         }
     }
-
-    public function validateInput(Input $input, $expected)
-    {
-                echo '<pre>';
-                print_r($expected);
-                echo '</pre>';
-        // throw new Exception("Input error");
-    }  
 }

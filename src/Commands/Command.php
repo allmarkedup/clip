@@ -33,12 +33,18 @@ abstract class Command
         return $this->getClassAnnotation('description') ?: '';
     }
 
-    public function getOpts()
+    public function getSignature()
     {
-        $expected = [];
-        $expected['arguments'] = $this->getArguments();
-        $expected['options'] = $this->getOptions();
-        return $expected;
+        return [
+            'args' => $this->getArguments(),
+            'opts' => $this->getArguments()
+        ];
+    }
+
+    public function run(Input $input, Output $output)
+    {
+        // TODO set property values here
+        return $this->execute($input, $output);
     }
 
     protected function getArguments()
@@ -61,8 +67,8 @@ abstract class Command
     protected function getAnnotatedProperties()
     {
         return array_map(function($property){
-            if ( isset($property['validate'] ) ) {
-                $property['validate'] = $this->parseValidationRules($property['validate']);
+            if ( isset($property['annotations']['validate'] ) ) {
+                $property['annotations']['validate'] = $this->parseValidationRules($property['annotations']['validate']);
             }
             return $property;
         }, $this->_annotationParser->getAnnotatedProperties());

@@ -27,6 +27,6 @@ class SayHelloCommand extends BaseCommand
 
     public function execute(Input $input, Output $output)
     {
-
+        echo $this->name;
     }
 }
