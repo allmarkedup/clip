@@ -13,17 +13,29 @@ class Input
     public function parseAndValidate($signature)
     {
         $options = [];
-        foreach ($signature['opts'] as $opt) {
-            $annots = $opt['annotations'];
-            $required = isset($annots['validate']['required']) ? Getopt::REQUIRED_ARGUMENT : Getopt::OPTIONAL_ARGUMENT;
-            // $short = 
+        foreach($signature['opts'] as $opt) {
+            $val = Getopt::NO_ARGUMENT;
+            if ( $opt['valueType'] === 'optional' ) {
+                $val = Getopt::OPTIONAL_ARGUMENT;
+            } elseif ( $opt['valueType'] === 'required' ) {
+                $val = Getopt::REQUIRED_ARGUMENT;
+            }
+            $options[] = new Option($opt['short'], $opt['long'], $val);
         }
-        // $getopt = new Getopt(array(
-        //     new Option('a', 'alpha', Getopt::REQUIRED_ARGUMENT),
-        //     new Option(null, 'beta', Getopt::OPTIONAL_ARGUMENT),
-        //     new Option('c', null)
-        // ));
+        $getopt = new Getopt($options);
+        
+        $getopt->parse($this->argv);
+        
+        $opts = $getopt->getOptions();
+        $args = $getopt->getOperands();
 
+                echo '<pre>';
+                print_r($opts);
+                echo '</pre>';
+
+                echo '<pre>';
+                print_r($args);
+                echo '</pre>';
     }
 
     public function getOption($name)
@@ -41,4 +53,5 @@ class Input
     public function getArguments()
     {
     }
+
 }

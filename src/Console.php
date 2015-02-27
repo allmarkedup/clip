@@ -1,6 +1,6 @@
 <?php namespace Amu\Clip;
 
-use Amu\Clip\Exception;
+use Amu\Clip\Exception\Exception;
 use Amu\Clip\Commands\Command;
 use Amu\Clip\Commands\ListCommand;
 
@@ -56,6 +56,9 @@ class Console
 
         } catch (Exception $e) {
             $output->error($e->getMessage());
+        } catch (\UnexpectedValueException $e ) {
+            $output->error($e->getMessage());
         }
+
     }
 }

@@ -1,10 +1,22 @@
-<?php namespace Amu\Clip\Annotations;
+<?php namespace Amu\Clip\Reflection;
 
-abstract class AnnotationParser
+class DocBlock
 {   
     private $keyPattern = "[A-z0-9\_\-]+";
 
     private $endPattern = "[ ]*(?:@|\r\n|\n)";
+
+    protected $docBlock;
+
+    public function __construct($docBlock)
+    {
+        $this->docBlock = $docBlock;
+    }
+
+    public function getAnnotations()
+    {
+        return $this->parseAnnotations($this->docBlock);
+    }
 
     protected function parseAnnotations($docBlock)
     {
@@ -31,10 +43,13 @@ abstract class AnnotationParser
     protected function parseValue($value = null)
     {
         if ($value === 'null') {
-            return;
+            return null;
         }
         if (($json = json_decode($value, true)) !== null) {
             return $json;
+        }
+        if ($value === '') {
+            return null;
         }
 
         return $value;

@@ -3,13 +3,17 @@
 use Amu\Clip\Input;
 use Amu\Clip\Output;
 use Amu\Clip\Console;
-use Amu\Clip\Annotations\ClassParser;
+use Amu\Clip\Reflection\CommandClass;
+use Amu\Clip\Reflection\CommandProperty;
+use Amu\Clip\Exception\AnnotationNotFoundException as NotFoundException;
 
 abstract class Command
 {
     private $_console;
 
-    private $_annotationParser;
+    private $_reflectedClass;
+
+    private $_reflectedProperties;
 
     abstract public function execute(Input $input, Output $output);
 
@@ -25,79 +29,73 @@ abstract class Command
 
     public function getName()
     {
-        return $this->getClassAnnotation('command') ?: $this->getNameFromClassName();
+        return $this->getCommandClass()->getName();
     }
 
     public function getDescription()
     {
-        return $this->getClassAnnotation('description') ?: '';
+        return $this->getCommandClass()->getDescription();
     }
 
     public function getSignature()
     {
         return [
-            'args' => $this->getArguments(),
-            'opts' => $this->getArguments()
+            'args' => $this->getArgumentSignature(),
+            'opts' => $this->getOptionSignature()
         ];
+    }
+
+    protected function getArgumentSignature()
+    {
+        $signature = [];
+        foreach ($this->getCommandClass()->getArgumentProperties() as $prop) {
+            $signature[] = [
+                'name' => $prop->getName(),
+                'validate' => $prop->getValidationRules()
+            ];
+        }
+        return $signature;
+    }
+
+    protected function getOptionSignature()
+    {
+        $signature = [];
+        foreach ($this->getCommandClass()->getOptionProperties() as $prop) {
+            $signature[] = [
+                'long' => $prop->getLongName(),
+                'short' => $prop->getShortName(),
+                'valueType' => $prop->getInputValueType(),
+                'validate' => $prop->getValidationRules(),
+            ];
+        }
+        return $signature;
     }
 
     public function run(Input $input, Output $output)
     {
-        // TODO set property values here
+        $this->setPropertiesFromInput($input);
+        if ($this->help) {
+            return $this->help($input, $output);
+        }
+
         return $this->execute($input, $output);
     }
 
-    protected function getArguments()
+    protected function help(Input $input, Output $output)
     {
-        return $this->filterProperties('type', 'argument');
+        $output->error('NOT IMPLEMENTED');
     }
 
-    protected function getOptions()
+    protected function setPropertiesFromInput(Input $input)
     {
-        return $this->filterProperties('type', 'option');
+
     }
 
-    protected function filterProperties($key, $value)
+    private function getCommandClass()
     {
-        return array_filter($this->getAnnotatedProperties(), function($property) use ($key, $value) {
-            return isset($property['annotations'][$key]) && $property['annotations'][$key] === $value;
-        });
-    }
-
-    protected function getAnnotatedProperties()
-    {
-        return array_map(function($property){
-            if ( isset($property['annotations']['validate'] ) ) {
-                $property['annotations']['validate'] = $this->parseValidationRules($property['annotations']['validate']);
-            }
-            return $property;
-        }, $this->_annotationParser->getAnnotatedProperties());
-    }
-
-    protected function parseValidationRules($validationString)
-    {
-        return explode('|', $validationString);
-    }
-
-    protected function getNameFromClassName()
-    {
-        $className = implode('', array_slice(explode('\\', get_class($this)), -1));
-        $className = str_replace('Command', '', $className);
-        preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $className, $matches);
-        $ret = $matches[0];
-        foreach ($ret as &$match) {
-            $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
+        if (! $this->_reflectedClass) {
+            $this->_reflectedClass = new CommandClass($this);
         }
-
-        return implode('-', $ret);
-    }
-
-    private function getClassAnnotation($name)
-    {
-        if (! $this->_annotationParser) {
-            $this->_annotationParser = new ClassParser($this);
-        }
-
-        return $this->_annotationParser->getClassAnnotation($name);
+        return $this->_reflectedClass;
     }
 }
