@@ -42,14 +42,13 @@ class Console
             if ($argv === null) {
                 $argv = isset($_SERVER['argv']) ? array_slice($_SERVER['argv'], 1) : array();
             }
-
             if (count($argv) === 0 || strpos($argv[0], '-') === 0) {
                 $command = $this->getCommand($this->defaultCommand);
             } else {
                 $command = $this->getCommand($argv[0]);
                 array_shift($argv);
             }
-
+            
             $input = new Input($argv);
             $input->parseAndValidate($command->getSignature());
             $command->run($input, $output);

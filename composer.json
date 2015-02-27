@@ -11,13 +11,12 @@
     "require": {
         "allmarkedup/reemote": "~0.1",
         "league/climate": "~2.6",
-        "ulrichsg/getopt-php": "2.2.*",
-        "docopt/docopt": "1.0.0-rc1"
+        "ulrichsg/getopt-php": "dev-master"
     },
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/allmarkedup/reemote"
+            "url": "https://github.com/allmarkedup/getopt-php"
         }
     ],
     "require-dev": {

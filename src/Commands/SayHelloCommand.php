@@ -19,6 +19,14 @@ class SayHelloCommand extends BaseCommand
     protected $name;
 
     /**
+     * @type argument
+     * 
+     * @description Who to say hello to
+     * @value required
+     */
+    protected $lastname;
+
+    /**
      * @type option
      * 
      * @description Use chatty mode
