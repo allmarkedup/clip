@@ -10,9 +10,24 @@ class Console
 
     protected $defaultCommand = 'list';
 
+    private $outputHandler;
+
     public function __construct()
     {
         $this->addCommand(new ListCommand());
+    }
+
+    public function setOutputHandler(Output $output)
+    {
+        $this->outputHandler = $output;
+    }
+
+    public function getOutputHandler()
+    {
+        if ( ! $this->outputHandler ) {
+            $this->outputHandler = new Output();
+        }
+        return $this->outputHandler;
     }
 
     public function addCommand(Command $command)
@@ -36,9 +51,8 @@ class Console
 
     public function run(array $argv = null)
     {
+        $output = $this->getOutputHandler();
         try {
-            $output = new Output();
-
             if ($argv === null) {
                 $argv = isset($_SERVER['argv']) ? array_slice($_SERVER['argv'], 1) : array();
             }
@@ -48,7 +62,6 @@ class Console
                 $command = $this->getCommand($argv[0]);
                 array_shift($argv);
             }
-
             $input = new Input($argv);
             $input->parseAndValidate($command->getSignature());
             $command->run($input, $output);
