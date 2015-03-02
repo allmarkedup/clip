@@ -53,9 +53,7 @@ class Console
             $input->parseAndValidate($command->getSignature());
             $command->run($input, $output);
 
-        } catch (Exception $e) {
-            $output->error($e->getMessage());
-        } catch (\UnexpectedValueException $e ) {
+        } catch (\Exception $e) {
             $output->error($e->getMessage());
         }
 

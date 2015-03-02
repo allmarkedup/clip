@@ -50,6 +50,7 @@ abstract class Command
         $signature = [];
         foreach ($this->getCommandClass()->getArgumentProperties() as $prop) {
             $signature[] = [
+                'key' => $prop->getPropertyName(),
                 'name' => $prop->getName(),
                 'validate' => $prop->getValidationRules()
             ];
@@ -62,6 +63,7 @@ abstract class Command
         $signature = [];
         foreach ($this->getCommandClass()->getOptionProperties() as $prop) {
             $signature[] = [
+                'key' => $prop->getPropertyName(),
                 'long' => $prop->getLongName(),
                 'short' => $prop->getShortName(),
                 'valueType' => $prop->getInputValueType(),
@@ -74,21 +76,32 @@ abstract class Command
     public function run(Input $input, Output $output)
     {
         $this->setPropertiesFromInput($input);
-        if ($this->help) {
+        if ( ! empty($this->help)) {
             return $this->help($input, $output);
         }
-
+        if ($input->hasErrors()) {
+            return $this->printErrors($input->getErrors(), $output);
+        }
         return $this->execute($input, $output);
     }
 
     protected function help(Input $input, Output $output)
     {
-        $output->error('NOT IMPLEMENTED');
+        $input->getOpts();
+    }
+
+    protected function printErrors($errors, $output)
+    {
+        foreach ($errors as $error) {
+            $output->error($error->getMessage());
+        }
     }
 
     protected function setPropertiesFromInput(Input $input)
     {
-
+        foreach($input->getAll() as $key => $result){
+            $this->$key = $result;
+        }
     }
 
     private function getCommandClass()

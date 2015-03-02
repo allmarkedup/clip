@@ -21,8 +21,7 @@ class SayHelloCommand extends BaseCommand
     /**
      * @type argument
      * 
-     * @description Who to say hello to
-     * @value required
+     * @description The last name
      */
     protected $lastname;
 
@@ -35,6 +34,6 @@ class SayHelloCommand extends BaseCommand
 
     public function execute(Input $input, Output $output)
     {
-        echo $this->name;
+        $output->greenOut($this->name);
     }
 }

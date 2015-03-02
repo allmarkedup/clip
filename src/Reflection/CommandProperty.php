@@ -20,6 +20,11 @@ class CommandProperty extends Reflected
         }
     }
 
+    public function getPropertyName()
+    {
+        return $this->reflectionObject->getName();
+    }
+
     public function getValidationRules()
     {
         try {
