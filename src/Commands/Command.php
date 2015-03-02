@@ -15,6 +15,8 @@ abstract class Command
 
     private $_reflectedProperties;
 
+    private $signature;
+
     abstract public function execute(Input $input, Output $output);
 
     public function getConsole()
@@ -39,10 +41,13 @@ abstract class Command
 
     public function getSignature()
     {
-        return [
-            'args' => $this->getArgumentSignature(),
-            'opts' => $this->getOptionSignature()
-        ];
+        if ( ! $this->signature ) {
+            $this->signature = [
+                'args' => $this->getArgumentSignature(),
+                'opts' => $this->getOptionSignature()
+            ];
+        }
+        return $this->signature;
     }
 
     protected function getArgumentSignature()
@@ -52,7 +57,9 @@ abstract class Command
             $signature[] = [
                 'key' => $prop->getPropertyName(),
                 'name' => $prop->getName(),
-                'validate' => $prop->getValidationRules()
+                'validate' => $prop->getValidationRules(),
+                'required' => $prop->isRequired(),
+                'description' => $prop->getDescription(),
             ];
         }
         return $signature;
@@ -68,6 +75,7 @@ abstract class Command
                 'short' => $prop->getShortName(),
                 'valueType' => $prop->getInputValueType(),
                 'validate' => $prop->getValidationRules(),
+                'description' => $prop->getDescription(),
             ];
         }
         return $signature;
@@ -87,7 +95,42 @@ abstract class Command
 
     protected function help(Input $input, Output $output)
     {
-        $input->getOpts();
+        $sig = $this->getSignature();
+        $args = implode(' ', array_map(function($arg){
+            $name = '<' . $arg['name'] . '>';
+            return $arg['required'] ? $name : '[' . $name . ']';
+        }, $sig['args']));
+
+        $output->br()->yellow('Usage: php ' . $_SERVER['PHP_SELF'] . ' ' . $this->getName() . ' ' . $args);
+
+        if ($desc = $this->getDescription()) {
+            $output->br()->out($desc);
+        }
+
+        if (count($sig['opts'])) {
+            $output->br();
+            $optStrings = [];
+            foreach ($sig['opts'] as $opt) {
+                $long = $opt['long'] ? '--' . $opt['long'] : null;
+                $short = $opt['short'] ? '-' . $opt['short'] : null;
+                $optStrings[] = [
+                    'label' => '  ' . implode(', ', array_filter([$long, $short], 'strlen')) . ' ',
+                    'description' => $opt['description']
+                ];
+            }
+            $maxOptsLen = 0;
+            foreach($optStrings as $os) {
+                if (mb_strlen($os['label']) > $maxOptsLen) {
+                    $maxOptsLen = mb_strlen($os['label']);
+                }
+            }
+            $pad = $output->padding($maxOptsLen + 5, ' ');
+            foreach ($optStrings as $os) {
+                $pad->label($os['label'])->result($os['description']);
+            }
+        }
+
+        $output->br();
     }
 
     protected function printErrors($errors, $output)

@@ -62,6 +62,11 @@ class Input
         return isset($this->validateInput['args']) ? $this->validateInput['args'] : [];
     }
 
+    public function getOpts()
+    {
+        return $this->getOpt;
+    }
+
     protected function validateInput($input, $signature)
     {
         $args = $this->checkArgs($input['args'], $signature['args']);
@@ -95,7 +100,7 @@ class Input
 
         // first check that the argument list matches the required argument list
         $requiredArgs = array_filter($signatureArgs, function($req){
-            return ! empty($req['validate']['required']);
+            return $req['required'];
         });
         $requiredCount = count($requiredArgs);
 

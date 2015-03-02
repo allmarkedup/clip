@@ -11,23 +11,11 @@ class Output
         $this->stdWriter = $this->getWriter();
     }
 
-    public function input($text)
-    {
-        return $this->getWriter()->input($text);
-    }
-
-    public function table($data)
-    {
-        return $this->getWriter()->table($data);
-    }
-
-    public function padding($width)
-    {
-        return $this->getWriter()->padding($width);
-    }
-
     public function __call($name, $args)
     {
+        if ( in_array($name, ['input','table','padding','columns','border','columns','progress','json','dump','flank','animation'])  ) {
+            return call_user_func_array(array($this->getWriter(), $name), $args);
+        }
         return call_user_func_array(array($this->stdWriter, $name), $args);
     }
 

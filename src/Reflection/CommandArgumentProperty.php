@@ -13,9 +13,13 @@ class CommandArgumentProperty extends CommandProperty
         }
     }
 
-    // public function isRequired()
-    // {
-    //     $rules = $this->getValidationRules();
-    //     return ! empty($rules['validate']);
-    // }
+    public function isRequired()
+    {
+        try {
+            return $this->getAnnotation('required');
+        } catch (NotFoundException $e){
+            $rules = $this->getValidationRules();
+            return ! empty($rules['required']);
+        }
+    }
 }
