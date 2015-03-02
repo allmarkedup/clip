@@ -45,7 +45,6 @@ abstract class Command
                 'opts' => $this->getOptionSignature(),
             ];
         }
-
         return $this->signature;
     }
 

@@ -142,6 +142,18 @@ class Input
         }
         $getopt = $this->getOpt = new Getopt($options);
 
+        // remove initial operands
+        $initialArgPos = 0;
+        for($i = 0; $i < count($argv); $i++) {
+            if ( strpos($argv[$i], '-') === 0 ) {
+                $initialArgPos = $i;
+                break;
+            }
+        }
+
+        $operands = array_slice($argv, 0, $initialArgPos);
+        $argv = array_slice($argv, $initialArgPos);
+
         try {
             $getopt->parse($argv);
         } catch (\Exception $e) {
@@ -149,7 +161,7 @@ class Input
         }
 
         $opts = $getopt->getOptions();
-        $operands = $getopt->getOperands();
+        $operands = array_merge($operands, $getopt->getOperands());
 
         $args = [];
         for ($i = 0; $i < count($signature['args']); $i++) {
@@ -159,7 +171,7 @@ class Input
                 break;
             }
         }
-
+        
         return compact('args', 'opts');
     }
 }
