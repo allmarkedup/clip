@@ -1,7 +1,7 @@
 <?php namespace Amu\Clip\Reflection;
 
 class DocBlock
-{   
+{
     private $keyPattern = "[A-z0-9\_\-]+";
 
     private $endPattern = "[ ]*(?:@|\r\n|\n)";
@@ -43,13 +43,13 @@ class DocBlock
     protected function parseValue($value = null)
     {
         if ($value === 'null') {
-            return null;
+            return;
         }
         if (($json = json_decode($value, true)) !== null) {
             return $json;
         }
         if ($value === '') {
-            return null;
+            return;
         }
 
         return $value;

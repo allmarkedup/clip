@@ -2,7 +2,6 @@
 
 use Amu\Clip\Input;
 use Amu\Clip\Output;
-use Amu\Clip\Commands\BaseCommand;
 
 /**
  * @command list

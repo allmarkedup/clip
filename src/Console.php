@@ -48,14 +48,12 @@ class Console
                 $command = $this->getCommand($argv[0]);
                 array_shift($argv);
             }
-            
+
             $input = new Input($argv);
             $input->parseAndValidate($command->getSignature());
             $command->run($input, $output);
-
         } catch (\Exception $e) {
             $output->error($e->getMessage());
         }
-
     }
 }

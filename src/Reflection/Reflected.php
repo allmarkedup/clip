@@ -4,7 +4,7 @@ use Amu\Clip\Exception\Exception;
 use Amu\Clip\Exception\AnnotationNotFoundException as NotFoundException;
 
 abstract class Reflected
-{   
+{
     protected $reflectionObject;
 
     protected $docBlock;
@@ -13,8 +13,8 @@ abstract class Reflected
     {
         try {
             return $this->getAnnotation('description');
-        } catch (NotFoundException $e){
-            return null;
+        } catch (NotFoundException $e) {
+            return;
         }
     }
 
@@ -30,7 +30,7 @@ abstract class Reflected
                 return $value;
             }
         }
-        throw new NotFoundException('Annotation ' . $name . ' not found');
+        throw new NotFoundException('Annotation '.$name.' not found');
     }
 
     public function getAnnotations()
@@ -45,9 +45,10 @@ abstract class Reflected
 
     public function getDocBlock()
     {
-        if ( ! $this->docBlock ) {
+        if (! $this->docBlock) {
             $this->docBlock = new DocBlock($this->reflectionObject->getDocComment());
         }
+
         return $this->docBlock;
     }
 

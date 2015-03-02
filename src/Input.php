@@ -13,7 +13,7 @@ class Input
 
     protected $validatedInput = [
         'args' => [],
-        'opts' => []
+        'opts' => [],
     ];
 
     public function __construct($argv = [])
@@ -71,7 +71,8 @@ class Input
     {
         $args = $this->checkArgs($input['args'], $signature['args']);
         $opts = $this->checkOpts($input['opts'], $signature['opts']);
-        $this->validatedInput = compact('args', 'opts');    
+        $this->validatedInput = compact('args', 'opts');
+
         return $this->validatedInput;
     }
 
@@ -90,6 +91,7 @@ class Input
                 }
             }
         }
+
         return $keyedOpts;
     }
 
@@ -99,7 +101,7 @@ class Input
         $sigArgCount = count($signatureArgs);
 
         // first check that the argument list matches the required argument list
-        $requiredArgs = array_filter($signatureArgs, function($req){
+        $requiredArgs = array_filter($signatureArgs, function ($req) {
             return $req['required'];
         });
         $requiredCount = count($requiredArgs);
@@ -108,13 +110,13 @@ class Input
             // not enough arguments
             $missingArgs = array_slice($requiredArgs, ($argCount - $requiredCount));
             $missingArgCount = count($missingArgs);
-            $missingArgsNames = array_map(function($mArg){
+            $missingArgsNames = array_map(function ($mArg) {
                 return $mArg['name'];
             }, $missingArgs);
-            $error = 'The ' . implode(', ', $missingArgsNames) . ' argument' . ($missingArgCount > 1 ? 's are ': ' is ') . 'required.';
+            $error = 'The '.implode(', ', $missingArgsNames).' argument'.($missingArgCount > 1 ? 's are ' : ' is ').'required.';
             $this->errors[] = new \LengthException($error);
         }
-        
+
         if ($argCount > $sigArgCount) {
             // too many arguments, don't throw and error
             // but cut the arg list down to the expected length
@@ -122,37 +124,37 @@ class Input
         }
 
         // TODO: apply specific validation rules
-        
+
         return $args;
     }
 
     protected function parse($argv, $signature)
     {
         $options = [];
-        foreach($signature['opts'] as $opt) {
+        foreach ($signature['opts'] as $opt) {
             $val = Getopt::NO_ARGUMENT;
-            if ( $opt['valueType'] === 'optional' ) {
+            if ($opt['valueType'] === 'optional') {
                 $val = Getopt::OPTIONAL_ARGUMENT;
-            } elseif ( $opt['valueType'] === 'required' ) {
+            } elseif ($opt['valueType'] === 'required') {
                 $val = Getopt::REQUIRED_ARGUMENT;
             }
             $options[] = new Option($opt['short'], $opt['long'], $val);
         }
         $getopt = $this->getOpt = new Getopt($options);
-        
+
         try {
-            $getopt->parse($argv);    
+            $getopt->parse($argv);
         } catch (\Exception $e) {
             $this->errors[] = $e;
         }
-        
+
         $opts = $getopt->getOptions();
         $operands = $getopt->getOperands();
 
         $args = [];
         for ($i = 0; $i < count($signature['args']); $i++) {
             if (isset($operands[$i])) {
-               $args[$signature['args'][$i]['name']] = $operands[$i];
+                $args[$signature['args'][$i]['name']] = $operands[$i];
             } else {
                 break;
             }
@@ -160,5 +162,4 @@ class Input
 
         return compact('args', 'opts');
     }
-
 }

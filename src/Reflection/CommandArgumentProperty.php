@@ -8,7 +8,7 @@ class CommandArgumentProperty extends CommandProperty
     {
         try {
             return $this->getAnnotation('name') === true ? $this->getName() : $this->getAnnotation('name');
-        } catch (NotFoundException $e){
+        } catch (NotFoundException $e) {
             return $this->reflectionObject->getName();
         }
     }
@@ -17,8 +17,9 @@ class CommandArgumentProperty extends CommandProperty
     {
         try {
             return $this->getAnnotation('required');
-        } catch (NotFoundException $e){
+        } catch (NotFoundException $e) {
             $rules = $this->getValidationRules();
+
             return ! empty($rules['required']);
         }
     }

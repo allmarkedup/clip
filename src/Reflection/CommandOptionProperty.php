@@ -8,11 +8,12 @@ class CommandOptionProperty extends CommandProperty
     {
         try {
             return $this->getAnnotation('long') === true ? $this->getName() : $this->getAnnotation('long');
-        } catch (NotFoundException $e){
-            if ( is_null($this->getShortName()) ) {
+        } catch (NotFoundException $e) {
+            if (is_null($this->getShortName())) {
                 return $this->getName();
             }
-            return null;
+
+            return;
         }
     }
 
@@ -20,8 +21,8 @@ class CommandOptionProperty extends CommandProperty
     {
         try {
             return $this->getAnnotation('short') === true ? $this->getName()[0] : $this->getAnnotation('short');
-        } catch (NotFoundException $e){
-            return null;
+        } catch (NotFoundException $e) {
+            return;
         }
     }
 
@@ -38,9 +39,10 @@ class CommandOptionProperty extends CommandProperty
                 default:
                     $val = null;
             }
+
             return $val;
-        } catch (NotFoundException $e){
-            return null;
+        } catch (NotFoundException $e) {
+            return;
         }
     }
 }

@@ -7,9 +7,9 @@ class CommandProperty extends Reflected
 {
     public function __construct($arg, $name = null)
     {
-        if ( $arg instanceof \ReflectionProperty ) {
+        if ($arg instanceof \ReflectionProperty) {
             $this->reflectionObject = $arg;
-        } elseif ( $arg instanceof self ) {
+        } elseif ($arg instanceof self) {
             $this->reflectionObject = $arg->getReflectionObject();
             $this->docBlock = $arg->getDocBlock();
         } else {
@@ -29,7 +29,7 @@ class CommandProperty extends Reflected
     {
         try {
             return $this->parseValidationString($this->getAnnotation('validate'));
-        } catch (NotFoundException $e){
+        } catch (NotFoundException $e) {
             return [];
         }
     }
@@ -37,15 +37,15 @@ class CommandProperty extends Reflected
     protected function parseValidationString($string)
     {
         $rules = [];
-        foreach(explode('|', $string) as $rule) {
-            if ( strpos($rule, ':') !== false ) {
+        foreach (explode('|', $string) as $rule) {
+            if (strpos($rule, ':') !== false) {
                 list($key, $value) = explode(':', $rule);
                 $rules[$key] = $value;
             } else {
                 $rules[$rule] = true;
             }
         }
+
         return $rules;
     }
-
 }

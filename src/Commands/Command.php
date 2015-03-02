@@ -4,8 +4,6 @@ use Amu\Clip\Input;
 use Amu\Clip\Output;
 use Amu\Clip\Console;
 use Amu\Clip\Reflection\CommandClass;
-use Amu\Clip\Reflection\CommandProperty;
-use Amu\Clip\Exception\AnnotationNotFoundException as NotFoundException;
 
 abstract class Command
 {
@@ -41,12 +39,13 @@ abstract class Command
 
     public function getSignature()
     {
-        if ( ! $this->signature ) {
+        if (! $this->signature) {
             $this->signature = [
                 'args' => $this->getArgumentSignature(),
-                'opts' => $this->getOptionSignature()
+                'opts' => $this->getOptionSignature(),
             ];
         }
+
         return $this->signature;
     }
 
@@ -62,6 +61,7 @@ abstract class Command
                 'description' => $prop->getDescription(),
             ];
         }
+
         return $signature;
     }
 
@@ -78,30 +78,33 @@ abstract class Command
                 'description' => $prop->getDescription(),
             ];
         }
+
         return $signature;
     }
 
     public function run(Input $input, Output $output)
     {
         $this->setPropertiesFromInput($input);
-        if ( ! empty($this->help)) {
+        if (! empty($this->help)) {
             return $this->help($input, $output);
         }
         if ($input->hasErrors()) {
             return $this->printErrors($input->getErrors(), $output);
         }
+
         return $this->execute($input, $output);
     }
 
     protected function help(Input $input, Output $output)
     {
         $sig = $this->getSignature();
-        $args = implode(' ', array_map(function($arg){
-            $name = '<' . $arg['name'] . '>';
-            return $arg['required'] ? $name : '[' . $name . ']';
+        $args = implode(' ', array_map(function ($arg) {
+            $name = '<'.$arg['name'].'>';
+
+            return $arg['required'] ? $name : '['.$name.']';
         }, $sig['args']));
 
-        $output->br()->yellow('Usage: php ' . $_SERVER['PHP_SELF'] . ' ' . $this->getName() . ' ' . $args);
+        $output->br()->yellow('Usage: php '.$_SERVER['PHP_SELF'].' '.$this->getName().' '.$args);
 
         if ($desc = $this->getDescription()) {
             $output->br()->out($desc);
@@ -111,15 +114,15 @@ abstract class Command
             $output->br();
             $optStrings = [];
             foreach ($sig['opts'] as $opt) {
-                $long = $opt['long'] ? '--' . $opt['long'] : null;
-                $short = $opt['short'] ? '-' . $opt['short'] : null;
+                $long = $opt['long'] ? '--'.$opt['long'] : null;
+                $short = $opt['short'] ? '-'.$opt['short'] : null;
                 $optStrings[] = [
-                    'label' => '  ' . implode(', ', array_filter([$long, $short], 'strlen')) . ' ',
-                    'description' => $opt['description']
+                    'label' => '  '.implode(', ', array_filter([$long, $short], 'strlen')).' ',
+                    'description' => $opt['description'],
                 ];
             }
             $maxOptsLen = 0;
-            foreach($optStrings as $os) {
+            foreach ($optStrings as $os) {
                 if (mb_strlen($os['label']) > $maxOptsLen) {
                     $maxOptsLen = mb_strlen($os['label']);
                 }
@@ -142,7 +145,7 @@ abstract class Command
 
     protected function setPropertiesFromInput(Input $input)
     {
-        foreach($input->getAll() as $key => $result){
+        foreach ($input->getAll() as $key => $result) {
             $this->$key = $result;
         }
     }
@@ -152,6 +155,7 @@ abstract class Command
         if (! $this->_reflectedClass) {
             $this->_reflectedClass = new CommandClass($this);
         }
+
         return $this->_reflectedClass;
     }
 }

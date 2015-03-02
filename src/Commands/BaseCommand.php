@@ -3,8 +3,8 @@
 abstract class BaseCommand extends Command
 {
     /**
-     * @type option
-     * 
+     * @var option
+     *
      * @long help
      * @short h
      * @description Show help for this command

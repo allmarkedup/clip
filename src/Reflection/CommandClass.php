@@ -6,7 +6,7 @@ class CommandClass extends Reflected
 {
     public function __construct($arg)
     {
-        if ( $arg instanceof \ReflectionObject || $arg instanceof \ReflectionClass ) {
+        if ($arg instanceof \ReflectionObject || $arg instanceof \ReflectionClass) {
             $this->reflectionObject = $arg;
         } elseif (is_object($arg)) {
             $this->reflectionObject = new \ReflectionObject($arg);
@@ -19,21 +19,21 @@ class CommandClass extends Reflected
     {
         try {
             return $this->getAnnotation('command');
-        } catch (NotFoundException $e){
+        } catch (NotFoundException $e) {
             return $this->getNameFromClassName();
         }
     }
 
     public function getAnnotatedProperties()
     {
-        return array_filter($this->getReflectedProperties(), function($property){
+        return array_filter($this->getReflectedProperties(), function ($property) {
             return $property->hasAnnotations();
         });
     }
 
     public function getReflectedProperties()
     {
-        return array_map(function($property){
+        return array_map(function ($property) {
             $prop = new CommandProperty($property);
             try {
                 if ($prop->getAnnotation('type') === 'argument') {
@@ -45,20 +45,21 @@ class CommandClass extends Reflected
             } catch (NotFoundException $e) {
                 // do nothing
             }
+
             return $prop;
         }, $this->reflectionObject->getProperties());
     }
 
     public function getOptionProperties()
     {
-        return array_filter($this->getAnnotatedProperties(), function($property) {
+        return array_filter($this->getAnnotatedProperties(), function ($property) {
             return ($property instanceof CommandOptionProperty);
         });
     }
 
     public function getArgumentProperties()
     {
-        return array_filter($this->getAnnotatedProperties(), function($property) {
+        return array_filter($this->getAnnotatedProperties(), function ($property) {
             return ($property instanceof CommandArgumentProperty);
         });
     }
