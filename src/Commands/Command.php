@@ -96,6 +96,10 @@ abstract class Command
 
     protected function help(Input $input, Output $output)
     {
+        if ($desc = $this->getDescription()) {
+            $output->br()->yellow($desc);
+        }
+
         $sig = $this->getSignature();
         $args = implode(' ', array_map(function ($arg) {
             $name = '<'.$arg['name'].'>';
@@ -103,12 +107,8 @@ abstract class Command
             return $arg['required'] ? $name : '['.$name.']';
         }, $sig['args']));
 
-        $output->br()->yellow('Usage: php '.$_SERVER['PHP_SELF'].' '.$this->getName().' '.$args);
-
-        if ($desc = $this->getDescription()) {
-            $output->br()->out($desc);
-        }
-
+        $output->br()->out('Usage: php '.$_SERVER['PHP_SELF'].' '.$this->getName().' '.$args);
+        
         if (count($sig['opts'])) {
             $output->br();
             $optStrings = [];
