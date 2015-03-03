@@ -64,20 +64,9 @@ class CommandClass extends Reflected
         });
     }
 
-    // protected function filterProperties($key, $value)
-    // {
-    //     return array_filter($this->getAnnotatedProperties(), function($property) use ($key, $value) {
-    //         try {
-    //             return $property->getAnnotation($key) === $value;
-    //         } catch (AnnotationNotFoundException $e) {
-    //             return false;
-    //         }
-    //     });
-    // }
-
     protected function getNameFromClassName()
     {
-        $className = implode('', array_slice(explode('\\', $this->name), -1));
+        $className = implode('', array_slice(explode('\\', $this->reflectionObject->getName()), -1));
         $className = str_replace('Command', '', $className);
         preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $className, $matches);
         $ret = $matches[0];
