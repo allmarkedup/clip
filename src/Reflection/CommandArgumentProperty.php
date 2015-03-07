@@ -9,7 +9,7 @@ class CommandArgumentProperty extends CommandProperty
         try {
             return $this->getAnnotation('name') === true ? $this->getName() : $this->getAnnotation('name');
         } catch (NotFoundException $e) {
-            return $this->reflectionObject->getName();
+            return $this->getPropertyName();
         }
     }
 

@@ -93,12 +93,14 @@ class Console
             $command = $this->getCommand($commandName);
             $signature = $command->getSignature();
 
-            $indexedArgKeys = array_map(function($arg){
-                return $arg['key'];
+            $indexedArgNames = array_map(function($arg){
+                return $arg['name'];
             }, $signature['args']);
 
             // create $argv style array from args
-            $argvOpts = [];
+            $argvOpts = array_map(function(){
+                return null;
+            }, $indexedArgNames);
             $argvArgs = [];
             foreach($args as $key => $value) {
                 if (strpos($key, '-') === 0) {
@@ -119,7 +121,7 @@ class Console
                         }
                     }
                 } else {
-                    $index = array_search($key, $indexedArgKeys);
+                    $index = array_search($key, $indexedArgNames);
                     if ($index !== false) {
                         $argvOpts[$index] = $value;
                     }
