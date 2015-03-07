@@ -17,6 +17,15 @@ class CommandOptionProperty extends CommandProperty
         }
     }
 
+    public function getIndex()
+    {
+        try {
+            return $this->getAnnotation('index');
+        } catch (NotFoundException $e) {
+            return null;
+        }
+    }
+
     public function getShortName()
     {
         try {

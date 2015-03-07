@@ -78,17 +78,46 @@ class Console
 
     public function call($commandName, $args = [])
     {
-        // concatenate args!!
-        if (is_string($args)) {
-            $args = array_map(function($arg){
-                return trim($arg);
-            }, explode(' ', $args));
-        }
         $output = $this->getOutputHandler();
-        try {
+        try {            
             $command = $this->getCommand($commandName);
-            $input = new Input($args);
-            $input->parseAndValidate($command->getSignature());
+            $signature = $command->getSignature();
+
+            $indexedArgKeys = array_map(function($arg){
+                return $arg['key'];
+            }, $signature['args']);
+
+            // create $argv style array from args
+            $argvOpts = [];
+            $argvArgs = [];
+            foreach($args as $key => $value) {
+                if (strpos($key, '-') === 0) {
+                    if ($value !== false) {
+                        if ( strpos($key, '--') === 0) {
+                            if ($value === true) {
+                                $argvArgs[] = $key;
+                            } else {
+                                $argvArgs[] = $key . '=' . $value;    
+                            }
+                        } else {
+                            if ($value === true) {
+                                $argvArgs[] = $key;
+                            } else {
+                                $argvArgs[] = $key;
+                                $argvArgs[] = $value;
+                            }
+                        }
+                    }
+                } else {
+                    $index = array_search($key, $indexedArgKeys);
+                    if ($index !== false) {
+                        $argvOpts[$index] = $value;
+                    }
+                }
+            }
+
+            $input = new Input(array_merge($argvOpts, $argvArgs));
+            $input->parseAndValidate($signature);
             return $command->run($input, $output);
         } catch (\Exception $e) {
             $output->error($e->getMessage());
