@@ -75,7 +75,7 @@ class Input
 
         return $this->validatedInput;
     }
-
+    
     protected function checkOpts($opts, $signatureOpts)
     {
         $keyedOpts = [];
@@ -130,18 +130,6 @@ class Input
 
     protected function parse($argv, $signature)
     {
-        $options = [];
-        foreach ($signature['opts'] as $opt) {
-            $val = Getopt::NO_ARGUMENT;
-            if ($opt['valueType'] === 'optional') {
-                $val = Getopt::OPTIONAL_ARGUMENT;
-            } elseif ($opt['valueType'] === 'required') {
-                $val = Getopt::REQUIRED_ARGUMENT;
-            }
-            $options[] = new Option($opt['short'], $opt['long'], $val);
-        }
-        $getopt = $this->getOpt = new Getopt($options);
-
         // remove initial operands
         $initialArgPos = 0;
         for($i = 0; $i < count($argv); $i++) {
@@ -150,19 +138,44 @@ class Input
                 break;
             }
         }
-
         $operands = array_slice($argv, 0, $initialArgPos);
         $argv = array_slice($argv, $initialArgPos);
 
-        try {
-            $getopt->parse($argv);
-        } catch (\Exception $e) {
-            $this->errors[] = $e;
+        if (count($signature['opts'])) {
+            $options = [];
+            foreach ($signature['opts'] as $opt) {
+                $val = Getopt::NO_ARGUMENT;
+                if ($opt['valueType'] === 'optional') {
+                    $val = Getopt::OPTIONAL_ARGUMENT;
+                } elseif ($opt['valueType'] === 'required') {
+                    $val = Getopt::REQUIRED_ARGUMENT;
+                }
+                $options[] = new Option($opt['short'], $opt['long'], $val);
+            }
+            $getopt = $this->getOpt = new Getopt($options);
+
+            try {
+                $getopt->parse($argv);
+            } catch (\Exception $e) {
+                $this->errors[] = $e;
+            }
+
+            $opts = $getopt->getOptions();
+            $operands = array_merge($operands, $getopt->getOperands());
+        } else {
+            // check there are no options set in argv
+            $unknownOpts = [];
+            foreach ($argv as $arg) {
+                if ( strpos($arg, '-') === 0 ) {
+                    $unknownOpts[] = $arg;
+                }
+            }
+            if (count($unknownOpts)) {
+                $this->errors[] = new \InvalidArgumentException('Unknown arguments');
+            }
+            $opts = [];
         }
-
-        $opts = $getopt->getOptions();
-        $operands = array_merge($operands, $getopt->getOperands());
-
+        
         $args = [];
         for ($i = 0; $i < count($signature['args']); $i++) {
             if (isset($operands[$i])) {

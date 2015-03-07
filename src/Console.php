@@ -6,14 +6,20 @@ use Amu\Clip\Commands\ListCommand;
 
 class Console
 {
+    protected $name;
+
+    protected $version;
+
     protected $commands = [];
 
     protected $defaultCommand = 'list';
 
     private $outputHandler;
 
-    public function __construct()
+    public function __construct($name = null, $version = null)
     {
+        $this->name = $name;
+        $this->version = $version;
         $this->addCommand(new ListCommand());
     }
 
@@ -64,9 +70,29 @@ class Console
             }
             $input = new Input($argv);
             $input->parseAndValidate($command->getSignature());
-            $command->run($input, $output);
+            return $command->run($input, $output);
         } catch (\Exception $e) {
             $output->error($e->getMessage());
         }
     }
+
+    public function call($commandName, $args = [])
+    {
+        // concatenate args!!
+        if (is_string($args)) {
+            $args = array_map(function($arg){
+                return trim($arg);
+            }, explode(' ', $args));
+        }
+        $output = $this->getOutputHandler();
+        try {
+            $command = $this->getCommand($commandName);
+            $input = new Input($args);
+            $input->parseAndValidate($command->getSignature());
+            return $command->run($input, $output);
+        } catch (\Exception $e) {
+            $output->error($e->getMessage());
+        }   
+    }
+
 }
