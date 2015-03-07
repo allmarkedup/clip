@@ -23,6 +23,16 @@ class Console
         $this->addCommand(new ListCommand());
     }
 
+    public function getName()
+    {
+        return $this->name ?: 'Console Application';
+    }
+
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
     public function setOutputHandler(Output $output)
     {
         $this->outputHandler = $output;

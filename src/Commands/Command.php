@@ -83,56 +83,17 @@ abstract class Command
 
     public function run(Input $input, Output $output)
     {
-        $this->setPropertiesFromInput($input);
-        if (! empty($this->help)) {
-            return $this->help($input, $output);
-        }
         if ($input->hasErrors()) {
             return $this->printErrors($input->getErrors(), $output);
         }
-
-        return $this->execute($input, $output);
+        $this->setPropertiesFromInput($input);
+        if ($this->beforeExecute($input, $output) !== false) {
+            return $this->execute($input, $output);    
+        }
     }
 
-    protected function help(Input $input, Output $output)
+    protected function beforeExecute(Input &$input, Output &$output)
     {
-        if ($desc = $this->getDescription()) {
-            $output->br()->yellow($desc);
-        }
-
-        $sig = $this->getSignature();
-        $args = implode(' ', array_map(function ($arg) {
-            $name = '<'.$arg['name'].'>';
-
-            return $arg['required'] ? $name : '['.$name.']';
-        }, $sig['args']));
-
-        $output->br()->out('Usage: php '.$_SERVER['PHP_SELF'].' '.$this->getName().' '.$args);
-        
-        if (count($sig['opts'])) {
-            $output->br();
-            $optStrings = [];
-            foreach ($sig['opts'] as $opt) {
-                $long = $opt['long'] ? '--'.$opt['long'] : null;
-                $short = $opt['short'] ? '-'.$opt['short'] : null;
-                $optStrings[] = [
-                    'label' => '  '.implode(', ', array_filter([$long, $short], 'strlen')).' ',
-                    'description' => $opt['description'],
-                ];
-            }
-            $maxOptsLen = 0;
-            foreach ($optStrings as $os) {
-                if (mb_strlen($os['label']) > $maxOptsLen) {
-                    $maxOptsLen = mb_strlen($os['label']);
-                }
-            }
-            $pad = $output->padding($maxOptsLen + 5, ' ');
-            foreach ($optStrings as $os) {
-                $pad->label($os['label'])->result($os['description']);
-            }
-        }
-
-        $output->br();
     }
 
     protected function printErrors($errors, $output)
