@@ -9,7 +9,7 @@
         }
     ],
     "require": {
-        "allmarkedup/reemote": "~2.0.*",
+        "allmarkedup/reemote": "~2.0",
         "league/climate": "~2.6",
         "ulrichsg/getopt-php": "2.2.*"
     },
